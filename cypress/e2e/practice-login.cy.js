@@ -35,6 +35,14 @@ describe('Practice Test Automation Login', () => {
       
     });
   
+    it('timestamp   ', () => {
+      // Enter invalid username and password
+      // timestamp of run log
+      const timestamp = new Date().getTime();
+      console.log(timestamp);
+      
+    });
+  
     
   
    
