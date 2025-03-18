@@ -34,10 +34,16 @@
     <div id='report-buttons'></div>
     <script>
       const reportFolders = [
-"20250318-023235"
+"20250318-010117"
+,"20250318-011949"
+,"20250318-014035"
+,"20250318-014650"
+,"20250318-021416"
+,"20250318-023235"
+,"20250318-023723"
 ];
 
-      // Function to generate buttons for all report folders
+      // Generate buttons for each report
       function generateReportButtons() {
         const reportButtonsContainer = document.getElementById('report-buttons');
         reportFolders.forEach((folder) => {
@@ -49,7 +55,6 @@
         });
       }
 
-      // Call the function to generate buttons when the page loads
       generateReportButtons();
     </script>
   </body>
