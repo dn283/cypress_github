@@ -54,6 +54,15 @@ jobs:
           # Create a new directory for this run
           mkdir -p gh-pages/$RUNID
           cp -r cypress/reports/html/* gh-pages/$RUNID/
+          
+      - name: Commit the new reports to gh-pages
+        run: |
+            git config --global user.name "GitHub Actions"
+            git config --global user.email "actions@github.com"
+            git add .
+            git commit -m "Add new Cypress test reports"
+            git push origin gh-pages
+        
 
       - name: Generate index.html with sorted reports
         run: |
