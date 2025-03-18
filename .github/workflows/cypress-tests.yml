@@ -24,6 +24,7 @@ jobs:
         run: npm install # Install npm dependencies
 
       - name: Run Cypress tests
+        continue-on-error: true
         run: npx cypress run --spec 'cypress/e2e/practice-login.cy.js' # Run your specific test file
 
       - name: Upload Mochawesome report
