@@ -1,48 +1,48 @@
 name: Cypress Tests
- 
- on:
-   push:
-     branches:
-       - main # Trigger the workflow on push to the main branch
-   pull_request:
-     branches:
-       - main # Trigger the workflow on pull requests to the main branch
- 
- jobs:
-   cypress-run:
-     runs-on: ubuntu-latest # Use the latest Ubuntu runner
-     steps:
-       - name: Checkout code
-         uses: actions/checkout@v3 # Check out the repository code
- 
-       - name: Set up Node.js
-         uses: actions/setup-node@v3
-         with:
-           node-version: 18 # Use Node.js 18 (or any version compatible with your project)
- 
-       - name: Install dependencies
-         run: npm install # Install npm dependencies
- 
-       - name: Generate RunID
-         id: runid
-         run: |
-           # Generate a unique RunID based on the current timestamp
-           echo "runID=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
- 
-       - name: Run Cypress tests
-         continue-on-error: true # Continue even if this step fails
-         run: npx cypress run --spec 'cypress/e2e/practice-login.cy.js' # Run your specific test file
- 
-       - name: Prepare report for GitHub Pages
-         run: |
-           # Create a directory for this run's report
-           mkdir -p public/${{ steps.runid.outputs.runID }}
-           # Copy the Mochawesome report to the new directory
-           cp -r cypress/reports/html/* public/${{ steps.runid.outputs.runID }}/
- 
-       - name: Deploy to GitHub Pages
-         uses: peaceiris/actions-gh-pages@v3
-         with:
-           github_token: ${{ secrets.GITHUB_TOKEN }}
-           publish_dir: ./public
-           keep_files: true # Keep previous reports
+
+on:
+  push:
+    branches:
+      - main # Trigger the workflow on push to the main branch
+  pull_request:
+    branches:
+      - main # Trigger the workflow on pull requests to the main branch
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest # Use the latest Ubuntu runner
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3 # Check out the repository code
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18 # Use Node.js 18 (or any version compatible with your project)
+
+      - name: Install dependencies
+        run: npm install # Install npm dependencies
+
+      - name: Generate RunID
+        id: runid
+        run: |
+          # Generate a unique RunID based on the current timestamp
+          echo "runID=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+
+      - name: Run Cypress tests
+        continue-on-error: true # Continue even if this step fails
+        run: npx cypress run --spec 'cypress/e2e/practice-login.cy.js' # Run your specific test file
+
+      - name: Prepare report for GitHub Pages
+        run: |
+          # Create a directory for this run's report
+          mkdir -p public/${{ steps.runid.outputs.runID }}
+          # Copy the Mochawesome report to the new directory
+          cp -r cypress/reports/html/* public/${{ steps.runid.outputs.runID }}/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          keep_files: true # Keep previous reports
