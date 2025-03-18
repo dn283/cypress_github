@@ -55,8 +55,8 @@ jobs:
           mkdir -p gh-pages/$RUNID
           cp -r cypress/reports/html/* gh-pages/$RUNID/
 
-          - name: Generate index.html with sorted reports
-          run: |
+      - name: Generate index.html with sorted reports
+        run: |
             echo "<!DOCTYPE html>
             <html>
               <head>
