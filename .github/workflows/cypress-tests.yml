@@ -30,4 +30,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: cypress-report
-          path: cypress/reports/mochawesome-report/ # Upload the Mochawesome report as an artifact
+          path: cypress/reports/html/ # Upload the Mochawesome report as an artifact
