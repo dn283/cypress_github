@@ -35,7 +35,10 @@ describe('Practice Test Automation Login', () => {
       
     });
   
-    
+    it('timestamp', () => {
+      // add timestamp to console
+      cy.log(new Date().toLocaleString());
+    });
   
    
   });
