@@ -42,49 +42,51 @@ jobs:
 
       - name: Update index.html
         run: |
-          # Check if index.html exists in the public directory
-          if [ -f public/index.html ]; then
-            # Insert the new button after the <p> tag in the existing index.html
-            sed -i '/<p>Click on a button below to view the corresponding test report.<\/p>/a \      <a href=".\/'${{ steps.runid.outputs.runID }}'\/" class="report-button">'${{ steps.runid.outputs.runID }}'<\/a>' public/index.html
-          else
-            # Create a new index.html file with the initial content and the new button
-            echo "<!DOCTYPE html>
-            <html>
-              <head>
-                <title>Cypress Test Reports</title>
-                <style>
-                  body {
-                    font-family: Arial, sans-serif;
-                    margin: 20px;
-                    text-align: center;
-                  }
-                  h1 {
-                    color: #333;
-                    margin: 20px 0;
-                  }
-                  .report-button {
-                    display: block;
-                    width: 200px;
-                    padding: 10px;
-                    margin: 10px auto;
-                    text-align: center;
-                    background-color: #007bff;
-                    color: white;
-                    text-decoration: none;
-                    border-radius: 5px;
-                  }
-                  .report-button:hover {
-                    background-color: #0056b3;
-                  }
-                </style>
-              </head>
-              <body>
-                <h1>Cypress Test Reports</h1>
-                <p>Click on a button below to view the corresponding test report.</p>
-                <a href='./${{ steps.runid.outputs.runID }}/' class='report-button'>${{ steps.runid.outputs.runID }}</a>
-              </body>
-            </html>" > public/index.html
-          fi
+          # Create or update the index.html file with buttons for all reports
+          echo "<!DOCTYPE html>
+          <html>
+            <head>
+              <title>Cypress Test Reports</title>
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  margin: 20px;
+                  text-align: center;
+                }
+                h1 {
+                  color: #333;
+                  margin: 20px 0;
+                }
+                .report-button {
+                  display: block;
+                  width: 200px;
+                  padding: 10px;
+                  margin: 10px auto;
+                  text-align: center;
+                  background-color: #007bff;
+                  color: white;
+                  text-decoration: none;
+                  border-radius: 5px;
+                }
+                .report-button:hover {
+                  background-color: #0056b3;
+                }
+              </style>
+            </head>
+            <body>
+              <h1>Cypress Test Reports</h1>
+              <p>Click on a button below to view the corresponding test report.</p>" > public/index.html
+
+          # Add buttons for all report folders
+          for dir in public/*/; do
+            if [ -d "$dir" ]; then
+              runID=$(basename "$dir")
+              echo "<a href='./$runID/' class='report-button'>$runID</a>" >> public/index.html
+            fi
+          done
+
+          echo "</body>
+          </html>" >> public/index.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
