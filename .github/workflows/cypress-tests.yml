@@ -23,12 +23,26 @@ jobs:
       - name: Install dependencies
         run: npm install # Install npm dependencies
 
+      - name: Generate RunID
+        id: runid
+        run: |
+          # Generate a unique RunID based on the current timestamp
+          echo "runID=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+
       - name: Run Cypress tests
-        continue-on-error: true
+        continue-on-error: true # Continue even if this step fails
         run: npx cypress run --spec 'cypress/e2e/practice-login.cy.js' # Run your specific test file
 
-      - name: Upload Mochawesome report
-        uses: actions/upload-artifact@v4
+      - name: Prepare report for GitHub Pages
+        run: |
+          # Create a directory for this run's report
+          mkdir -p public/${{ steps.runid.outputs.runID }}
+          # Copy the Mochawesome report to the new directory
+          cp -r cypress/reports/html/* public/${{ steps.runid.outputs.runID }}/
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          name: cypress-report
-          path: cypress/reports/html/ # Upload the Mochawesome report as an artifact
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          keep_files: true # Keep previous reports
