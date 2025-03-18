@@ -27,7 +27,7 @@ jobs:
         run: npx cypress run --spec 'cypress/e2e/practice-login.cy.js' # Run your specific test file
 
       - name: Upload Mochawesome report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cypress-report
           path: cypress/reports/html/ # Upload the Mochawesome report as an artifact
