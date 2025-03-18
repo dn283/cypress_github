@@ -40,6 +40,11 @@ jobs:
           # Copy the Mochawesome report to the new directory
           cp -r cypress/reports/html/* public/${{ steps.runid.outputs.runID }}/
 
+      - name: Update index.html
+        run: |
+          # Append a new button for this run's report to the index.html file
+          echo "<a href='./${{ steps.runid.outputs.runID }}/' class='report-button'>${{ steps.runid.outputs.runID }}</a>" >> public/index.html
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
