@@ -52,8 +52,8 @@ jobs:
           mkdir -p gh-pages
 
           # Create a new directory for this run
-          mkdir -p gh-pages/$RUNID
-          cp -r cypress/reports/html/* gh-pages/$RUNID/
+          mkdir -p gh-pages/${{ env.runID }}
+          cp -r cypress/reports/html/* gh-pages/${{ env.runID }}/
 
   
         
