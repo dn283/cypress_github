@@ -1,0 +1,27 @@
+{
+  "name": "cypress_github",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dn283/cypress_github.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dn283/cypress_github/issues"
+  },
+  "homepage": "https://github.com/dn283/cypress_github#readme",
+  "description": "",
+  "devDependencies": {
+    "cypress": "^14.2.0",
+    "cypress-mochawesome-reporter": "^3.8.2",
+    "mochawesome": "^7.1.3",
+    "mochawesome-merge": "^5.0.0",
+    "mochawesome-report-generator": "^6.2.0"
+  }
+}
