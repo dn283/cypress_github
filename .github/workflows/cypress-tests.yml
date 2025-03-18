@@ -52,80 +52,81 @@ jobs:
           mkdir -p gh-pages
 
           # Create a new directory for this run
-          mkdir -p gh-pages/${{ env.runID }}
-          cp -r cypress/reports/html/* gh-pages/${{ env.runID }}/
+          mkdir -p gh-pages/$RUNID
+          cp -r cypress/reports/html/* gh-pages/$RUNID/
 
-      - name: Generate index.html with all reports
-        run: |
-          echo "<!DOCTYPE html>
-          <html>
-            <head>
-              <title>Cypress Test Reports</title>
-              <style>
-                body {
-                  font-family: Arial, sans-serif;
-                  margin: 20px;
-                  text-align: center;
-                }
-                h1 {
-                  color: #333;
-                  margin: 20px 0;
-                }
-                .report-button {
-                  display: block;
-                  width: 200px;
-                  padding: 10px;
-                  margin: 10px auto;
-                  text-align: center;
-                  background-color: #007bff;
-                  color: white;
-                  text-decoration: none;
-                  border-radius: 5px;
-                }
-                .report-button:hover {
-                  background-color: #0056b3;
-                }
-              </style>
-            </head>
-            <body>
-              <h1>Cypress Test Reports</h1>
-              <p>Click on a button below to view the corresponding test report.</p>
-              <div id='report-buttons'></div>
-              <script>
-                const reportFolders = [" > gh-pages/index.html
-
-          # Append all existing report folders to JavaScript array
-          first=true
-          for dir in gh-pages/*/; do
-            if [ -d "$dir" ]; then
-              runID=$(basename "$dir")
-              if [ "$first" = true ]; then
-                echo "\"$runID\"" >> gh-pages/index.html
-                first=false
-              else
-                echo ",\"$runID\"" >> gh-pages/index.html
+          - name: Generate index.html with sorted reports
+          run: |
+            echo "<!DOCTYPE html>
+            <html>
+              <head>
+                <title>Cypress Test Reports</title>
+                <style>
+                  body {
+                    font-family: Arial, sans-serif;
+                    margin: 20px;
+                    text-align: center;
+                  }
+                  h1 {
+                    color: #333;
+                    margin: 20px 0;
+                  }
+                  .report-button {
+                    display: block;
+                    width: 200px;
+                    padding: 10px;
+                    margin: 10px auto;
+                    text-align: center;
+                    background-color: #007bff;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 5px;
+                  }
+                  .report-button:hover {
+                    background-color: #0056b3;
+                  }
+                </style>
+              </head>
+              <body>
+                <h1>Cypress Test Reports</h1>
+                <p>Click on a button below to view the corresponding test report.</p>
+                <div id='report-buttons'></div>
+                <script>
+                  const reportFolders = [" > gh-pages/index.html
+        
+            first=true
+            # Get report folders sorted by latest first (based on folder name, assuming runID is a timestamp)
+            for dir in $(ls -d gh-pages/*/ | sort -r); do
+              if [ -d "$dir" ]; then
+                runID=$(basename "$dir")
+                if [ "$first" = true ]; then
+                  echo "\"$runID\"" >> gh-pages/index.html
+                  first=false
+                else
+                  echo ",\"$runID\"" >> gh-pages/index.html
+                fi
               fi
-            fi
-          done
-
-          echo "];
-
-                // Generate buttons for each report
-                function generateReportButtons() {
-                  const reportButtonsContainer = document.getElementById('report-buttons');
-                  reportFolders.forEach((folder) => {
-                    const button = document.createElement('a');
-                    button.href = './' + folder + '/';
-                    button.className = 'report-button';
-                    button.textContent = folder;
-                    reportButtonsContainer.appendChild(button);
-                  });
-                }
-
-                generateReportButtons();
-              </script>
-            </body>
-          </html>" >> gh-pages/index.html
+            done
+        
+            echo "];
+        
+                  // Generate buttons for each report (latest first)
+                  function generateReportButtons() {
+                    const reportButtonsContainer = document.getElementById('report-buttons');
+                    reportFolders.forEach((folder) => {
+                      const button = document.createElement('a');
+                      button.href = './' + folder + '/';
+                      button.className = 'report-button';
+                      button.textContent = folder;
+                      reportButtonsContainer.appendChild(button);
+                    });
+                  }
+        
+                  generateReportButtons();
+                </script>
+              </body>
+            </html>" >> gh-pages/index.html
+        
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
