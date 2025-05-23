@@ -34,3 +34,8 @@ jobs:
           name: cypress-test-report
           path: |
             cypress/reports/html/index.json
+
+  postjob:
+    needs: cypress-run
+    if: always() # Ensure this step runs even if the Cypress tests fail
+    uses: ./.github/workflows/generate-summary.yml
