@@ -1,11 +1,11 @@
 name: Generate and Upload Summary
 
 on:
-  workflow_run:
-    workflows:
-      - New Cypress Tests
-    types:
-      - completed
+  workflow_call:
+    inputs:
+      run_id:
+        required: true
+        type: string
 
 jobs:
   generate-summary:
