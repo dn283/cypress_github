@@ -1,0 +1,36 @@
+name: New Cypress Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Cypress tests
+        continue-on-error: true
+        run: npx cypress run --spec 'cypress/e2e/practice-login.cy.js'
+
+      - name: Upload Cypress Test Report
+        if: always() # Ensure this step runs even if the Cypress tests fail
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-test-report
+          path: |
+            cypress/reports/html/index.json

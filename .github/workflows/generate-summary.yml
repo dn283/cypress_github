@@ -1,0 +1,82 @@
+name: Generate and Upload Summary
+
+on:
+  workflow_run:
+    workflows:
+      - New Cypress Tests
+    types:
+      - completed
+
+jobs:
+  generate-summary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Cypress Test Report
+        uses: actions/download-artifact@v3
+        with:
+          name: cypress-test-report
+          path: cypress/reports/html
+
+      - name: Read Cypress Test Report and Generate Summary
+        run: |
+          if [ -f cypress/reports/html/index.json ]; then
+            echo "Cypress Test Report found. Parsing results..."
+            
+            # Extract pass and fail numbers using jq
+            PASSED=$(jq '.stats.passes' cypress/reports/html/index.json)
+            FAILED=$(jq '.stats.failures' cypress/reports/html/index.json)
+            
+            # Generate HTML content
+            echo "<!DOCTYPE html>
+            <html>
+              <head>
+                <title>Cypress Test Summary</title>
+                <style>
+                  body {
+                    font-family: Arial, sans-serif;
+                    margin: 20px;
+                    text-align: center;
+                  }
+                  .summary {
+                    margin: 20px auto;
+                    padding: 20px;
+                    border: 1px solid #ddd;
+                    border-radius: 10px;
+                    max-width: 400px;
+                    background-color: #f9f9f9;
+                  }
+                  .summary h1 {
+                    color: #333;
+                  }
+                  .summary p {
+                    font-size: 18px;
+                    margin: 10px 0;
+                  }
+                  .passed {
+                    color: green;
+                  }
+                  .failed {
+                    color: red;
+                  }
+                </style>
+              </head>
+              <body>
+                <div class='summary'>
+                  <h1>Cypress Test Summary</h1>
+                  <p class='passed'>✅ Passed: $PASSED</p>
+                  <p class='failed'>❌ Failed: $FAILED</p>
+                </div>
+              </body>
+            </html>" > cypress/reports/html/summary.html
+
+            echo "Summary HTML generated at cypress/reports/html/summary.html"
+          else
+            echo "Cypress Test Report not found."
+          fi
+
+      - name: Upload Cypress Test Summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-test-summary
+          path: |
+            cypress/reports/html/summary.html
