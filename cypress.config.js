@@ -8,6 +8,7 @@ module.exports = defineConfig({
     embeddedScreenshots: true, // Embed screenshots in the report
     inlineAssets: true, // Embed assets (CSS, JS) in the report
     saveAllAttempts: false, // Do not save all test attempts
+    saveJson: true, // Save JSON report
   },
   e2e: {
     setupNodeEvents(on, config) {

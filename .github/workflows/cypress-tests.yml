@@ -31,109 +31,167 @@ jobs:
         continue-on-error: true
         run: npx cypress run --spec 'cypress/e2e/practice-login.cy.js'
 
-      - name: Setup GitHub Pages directory
+      - name: Read Cypress Test Report and Generate Summary
+        if: always() # Ensure this step runs even if the Cypress tests fail
         run: |
-          # Create a temporary directory to store reports
-          mkdir -p gh-pages
-          cd gh-pages
-
-          # Pull existing reports from gh-pages branch
-          git init
-          git remote add origin https://github.com/${{ github.repository }}.git
-          git fetch origin gh-pages --depth=1
-          git checkout gh-pages || echo "No gh-pages branch yet"
-
-          # Move back to main working directory
-          cd ..
-
-      - name: Prepare report for GitHub Pages
-        run: |
-          # Ensure gh-pages directory exists
-          mkdir -p gh-pages
-
-          # Create a new directory for this run
-          mkdir -p gh-pages/${{ env.runID }}
-          cp -r cypress/reports/html/* gh-pages/${{ env.runID }}/
-
-  
-        
-
-      - name: Generate index.html with sorted reports
-        run: |
+          if [ -f cypress/reports/html/index.json ]; then
+            echo "Cypress Test Report found. Parsing results..."
+            
+            # Extract pass and fail numbers using jq
+            PASSED=$(jq '.stats.passes' cypress/reports/html/index.json)
+            FAILED=$(jq '.stats.failures' cypress/reports/html/index.json)
+            
+            # Generate HTML content
             echo "<!DOCTYPE html>
             <html>
               <head>
-                <title>Cypress Test Report</title>
+                <title>Cypress Test Summary</title>
                 <style>
                   body {
                     font-family: Arial, sans-serif;
                     margin: 20px;
                     text-align: center;
                   }
-                  h1 {
+                  .summary {
+                    margin: 20px auto;
+                    padding: 20px;
+                    border: 1px solid #ddd;
+                    border-radius: 10px;
+                    max-width: 400px;
+                    background-color: #f9f9f9;
+                  }
+                  .summary h1 {
                     color: #333;
-                    margin: 20px 0;
                   }
-                  .report-button {
-                    display: block;
-                    width: 200px;
-                    padding: 10px;
-                    margin: 10px auto;
-                    text-align: center;
-                    background-color: #007bff;
-                    color: white;
-                    text-decoration: none;
-                    border-radius: 5px;
+                  .summary p {
+                    font-size: 18px;
+                    margin: 10px 0;
                   }
-                  .report-button:hover {
-                    background-color: #0056b3;
+                  .passed {
+                    color: green;
+                  }
+                  .failed {
+                    color: red;
                   }
                 </style>
               </head>
               <body>
-                <h1>Cypress Test Reports</h1>
-                <p>Click on a button below to view the corresponding test report.</p>
-                <div id='report-buttons'></div>
-                <script>
-                  const reportFolders = [" > gh-pages/index.html
-        
-            first=true
-            # Get report folders sorted by latest first (based on folder name, assuming runID is a timestamp)
-            for dir in $(ls -d gh-pages/*/ | sort -r); do
-              if [ -d "$dir" ]; then
-                runID=$(basename "$dir")
-                if [ "$first" = true ]; then
-                  echo "\"$runID\"" >> gh-pages/index.html
-                  first=false
-                else
-                  echo ",\"$runID\"" >> gh-pages/index.html
-                fi
-              fi
-            done
-        
-            echo "];
-        
-                  // Generate buttons for each report (latest first)
-                  function generateReportButtons() {
-                    const reportButtonsContainer = document.getElementById('report-buttons');
-                    reportFolders.forEach((folder) => {
-                      const button = document.createElement('a');
-                      button.href = './' + folder + '/';
-                      button.className = 'report-button';
-                      button.textContent = folder;
-                      reportButtonsContainer.appendChild(button);
-                    });
-                  }
-        
-                  generateReportButtons();
-                </script>
+                <div class='summary'>
+                  <h1>Cypress Test Summary</h1>
+                  <p class='passed'>✅ Passed: $PASSED</p>
+                  <p class='failed'>❌ Failed: $FAILED</p>
+                </div>
               </body>
-            </html>" >> gh-pages/index.html
+            </html>" > cypress/reports/html/summary.html
+
+            echo "Summary HTML generated at cypress/reports/html/summary.html"
+          else
+            echo "Cypress Test Report not found."
+          fi
+
+      # - name: Setup GitHub Pages directory
+      #   run: |
+      #     # Create a temporary directory to store reports
+      #     mkdir -p gh-pages
+      #     cd gh-pages
+
+      #     # Pull existing reports from gh-pages branch
+      #     git init
+      #     git remote add origin https://github.com/${{ github.repository }}.git
+      #     git fetch origin gh-pages --depth=1
+      #     git checkout gh-pages || echo "No gh-pages branch yet"
+
+      #     # Move back to main working directory
+      #     cd ..
+
+      # - name: Prepare report for GitHub Pages
+      #   run: |
+      #     # Ensure gh-pages directory exists
+      #     mkdir -p gh-pages
+
+      #     # Create a new directory for this run
+      #     mkdir -p gh-pages/${{ env.runID }}
+      #     cp -r cypress/reports/html/* gh-pages/${{ env.runID }}/
+
+  
         
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: gh-pages
-          keep_files: true
+      # - name: Generate index.html with sorted reports
+      #   run: |
+      #       echo "<!DOCTYPE html>
+      #       <html>
+      #         <head>
+      #           <title>Cypress Test Report</title>
+      #           <style>
+      #             body {
+      #               font-family: Arial, sans-serif;
+      #               margin: 20px;
+      #               text-align: center;
+      #             }
+      #             h1 {
+      #               color: #333;
+      #               margin: 20px 0;
+      #             }
+      #             .report-button {
+      #               display: block;
+      #               width: 200px;
+      #               padding: 10px;
+      #               margin: 10px auto;
+      #               text-align: center;
+      #               background-color: #007bff;
+      #               color: white;
+      #               text-decoration: none;
+      #               border-radius: 5px;
+      #             }
+      #             .report-button:hover {
+      #               background-color: #0056b3;
+      #             }
+      #           </style>
+      #         </head>
+      #         <body>
+      #           <h1>Cypress Test Reports</h1>
+      #           <p>Click on a button below to view the corresponding test report.</p>
+      #           <div id='report-buttons'></div>
+      #           <script>
+      #             const reportFolders = [" > gh-pages/index.html
+        
+      #       first=true
+      #       # Get report folders sorted by latest first (based on folder name, assuming runID is a timestamp)
+      #       for dir in $(ls -d gh-pages/*/ | sort -r); do
+      #         if [ -d "$dir" ]; then
+      #           runID=$(basename "$dir")
+      #           if [ "$first" = true ]; then
+      #             echo "\"$runID\"" >> gh-pages/index.html
+      #             first=false
+      #           else
+      #             echo ",\"$runID\"" >> gh-pages/index.html
+      #           fi
+      #         fi
+      #       done
+        
+      #       echo "];
+        
+      #             // Generate buttons for each report (latest first)
+      #             function generateReportButtons() {
+      #               const reportButtonsContainer = document.getElementById('report-buttons');
+      #               reportFolders.forEach((folder) => {
+      #                 const button = document.createElement('a');
+      #                 button.href = './' + folder + '/';
+      #                 button.className = 'report-button';
+      #                 button.textContent = folder;
+      #                 reportButtonsContainer.appendChild(button);
+      #               });
+      #             }
+        
+      #             generateReportButtons();
+      #           </script>
+      #         </body>
+      #       </html>" >> gh-pages/index.html
+        
+
+      # - name: Deploy to GitHub Pages
+      #   uses: peaceiris/actions-gh-pages@v3
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     publish_dir: gh-pages
+      #     keep_files: true
